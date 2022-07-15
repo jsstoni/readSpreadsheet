@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Puerta de vidrio</title>
+	<style>
+		body {
+			background: #f7f7f7;
+			font-family: 'Arial';
+			font-size: 1em;
+		}
+		h1 {
+			margin: 0;
+		}
+		.item {
+			background: #fff;
+			border: #e1e1e1 solid 1px;
+			border-bottom: #e1e1e1 solid 6px;
+			border-radius: 8px;
+			margin: 10px auto;
+			width: 50%;
+			box-sizing: border-box;
+			padding: 30px;
+		}
+	</style>
+</head>
+<body>
+<a href="https://forms.gle/Ni1ytdJmFqUaVfcE8">Publicar</a>
+<div id="app">
+	<div v-for="(item, index) in rows" :key="index">
+		<div v-if="index > 0 && item.length > 0" class="item">
+			<h1>{{item[2]}}</h1>
+			<strong>Publicado: {{tiempo(item[0])}}</strong> <br>
+			<span>{{item[3]}} - Sueldo: {{item[4]}} - Modalidad: {{item[5]}}</span> <br>
+			<a :href="item[6]" target="_blank">Sitio web</a> <br>
+			Contactos: {{item[8]}}
+		</div>
+	</div>
+</div>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/locale/es.min.js"></script>
+<script src="https://unpkg.com/vue@3"></script>
+<script>
+const { createApp } = Vue;
+createApp({
+	data() {
+		return {
+			errors: '',
+			rows: []
+		}
+	},
+	methods: {
+		async readSheet() {
+			const file = await axios({
+				methods: "GET",
+				url: "https://sheets.googleapis.com/v4/spreadsheets/1wM6GLRSDM5oIhfxUuISoNZT6VKgPBXngRIOsHLzkNjA/values/Respuestas!A:G",
+				responseType: "json",
+				params: {
+					key: "AIzaSyD7WS4yWuz1NRufiqw6wL74x29SCIYr_J4"
+				}
+			});
+			const { error, values } = file.data;
+			if (error) this.errors = error;
+			else this.rows = values;
+		},
+		tiempo(item) {
+			return moment(item, "DD/MM/YYYY HH:mm:ss").fromNow()
+		}
+	},
+	created() {
+		this.readSheet();
+	}
+}).mount("#app");
+</script>
+</body>
+</html>
